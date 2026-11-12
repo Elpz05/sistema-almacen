@@ -1,0 +1,54 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Crear release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Instalar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Revisar sintaxis PHP antes de publicar
+        run: |
+          errores=0
+          while IFS= read -r -d '' archivo; do
+            if ! php -l "$archivo" > /dev/null; then
+              echo "::error file=$archivo::Error de sintaxis en $archivo"
+              errores=1
+            fi
+          done < <(find . -type f -name "*.php" -not -path "./vendor/*" -print0)
+          exit $errores
+
+      - name: Empaquetar el sistema
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          zip -r "sistema-almacen-${VERSION}.zip" . \
+            -x ".git/*" \
+            -x ".github/*" \
+            -x ".gitignore" \
+            -x "node_modules/*" \
+            -x "*.zip"
+
+      - name: Publicar release en GitHub
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Sistema de Almacén ${{ github.ref_name }}
+          generate_release_notes: true
+          files: sistema-almacen-${{ github.ref_name }}.zip

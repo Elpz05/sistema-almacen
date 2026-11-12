@@ -1,0 +1,47 @@
+name: sistema-almacen
+
+services:
+  app:
+    image: ghcr.io/elpz05/sistema-almacen:${APP_VERSION:-latest}
+    container_name: sistema-almacen-app
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - almacen-net
+
+  db:
+    image: mysql:8.0
+    container_name: sistema-almacen-db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - almacen-net
+
+volumes:
+  db-data:
+
+networks:
+  almacen-net:
+    driver: bridge
