@@ -56,6 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             throw new Exception("Error al actualizar el inventario.");
         }
 
+        $nuevo_stock = calcular_stock((int)$p['stock_actual'], $cant, $tipo);
+
         // Si todo salió bien, guardamos permanentemente
         $conn->commit();
         echo json_encode(["status" => "success"]);
