@@ -1,0 +1,11 @@
+.git
+.github
+.env
+*.sql
+database
+docker
+scripts
+tests
+*.md
+-x ".env" \
+-x "*.sql" \
