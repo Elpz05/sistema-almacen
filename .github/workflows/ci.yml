@@ -62,3 +62,23 @@ jobs:
 
       - name: Revisar sintaxis de bot.js
         run: node --check bot.js
+
+  unit-tests:
+    name: Pruebas unitarias
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar PHP y Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          tools: composer
+          coverage: none
+
+      - name: Instalar dependencias
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Ejecutar pruebas
+        run: vendor/bin/phpunit tests

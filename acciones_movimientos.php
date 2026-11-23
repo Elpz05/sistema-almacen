@@ -1,4 +1,5 @@
 <?php
+require_once 'funciones_stock.php';
 include 'auth.php'; // Verifica sesión
 include 'db.php';   // Conexión a la BD
 

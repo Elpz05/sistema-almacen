@@ -1,2 +1,5 @@
 .env
 u589634571_almacen.sql
+.env.bak.*
+backups/
+vendor/
